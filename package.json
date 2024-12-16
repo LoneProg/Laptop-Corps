@@ -1,0 +1,17 @@
+{
+  "name": "laptop-corps",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js"
+  },
+  "author": "loneprog",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.8.4"
+  },
+  "description": "A laptop4dev project to store peoples info and enable login and signup capabilities and list out the registered users names"
+}
