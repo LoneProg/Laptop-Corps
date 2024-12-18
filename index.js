@@ -62,16 +62,17 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
-const User = mongoose.model("User", UserSchema)
+const User = mongoose.model("User", UserSchema);
 
 app.get("/", async (req, res) => {
-  res.send("Hello, welcome to the Laptop-Corps API!");
+  res.send("Hello, welcome to the Laptop4dev,Input your detail");
 });
 
 app.post("/signup", async (req, res) => {
   try {
-    const { firstName, lastname, password, email, phoneNumber, reason } = req.body;
-    if (!firstName || !lastname  || !password || !email || !phoneNumber) {
+    const { firstName, lastname, password, email, phoneNumber, reason } =
+      req.body;
+    if (!firstName || !lastname || !password || !email || !phoneNumber) {
       return res
         .status(400)
         .json({ error: "Please fill up the required fields" });
@@ -88,33 +89,61 @@ app.post("/signup", async (req, res) => {
     const registeredUser = await user.save();
     res.status(201).json({ message: "Signup successful!" });
     console.log("New user created");
-    
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error." });
   }
 });
 
-app.get("/usersData", async(req,res) => {
+app.post("/login", async (req, res) => {
   try {
-    const userList = await User.find({}, '-password')
-    res.status(200).json({userList})
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ error: "Please input the required fields" });
+    }
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res
+        .status(401)
+        .json({ error: "You are not registered, Please register" });
+    }
+    const isMatch = await encrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res
+        .status(401)
+        .json({ error: "Incorrect password, Input a agin or reset password" });
+    }
+    res.status(200).json({ message: "Login successful" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server error" });
+  }
+});
+
+app.get("/usersData", async (req, res) => {
+  try {
+    const userList = await User.find({}, "-password");
+    res.status(200).json({ userList });
     console.log("All users printed out successfully");
-    
   } catch (error) {
     console.log("Error in /users-list:", error);
-    res.status(500).json({error: "Internal Server error"})
+    res.status(500).json({ error: "Internal Server error" });
   }
-})
+});
 
-app.get("/numberOfUsers", async(req, res)=>{
+app.get("/numberOfUsers", async (req, res) => {
   try {
-    const numberOfUsers = await User.countDocuments()
-    res.status(200).json({numberOfUsers});
-    console.log("Total number of users printed out successfully:", numberOfUsers);
+    const numberOfUsers = await User.countDocuments();
+    res.status(200).json({ numberOfUsers });
+    console.log(
+      "Total number of users printed out successfully:",
+      numberOfUsers
+    );
   } catch (error) {
-    console.error(error)
-    res.status(500).json({error: "Internal Server error"});
+    console.error(error);
+    res.status(500).json({ error: "Internal Server error" });
   }
 });
 
